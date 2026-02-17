@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anotações e Calculadora</title>
+
+<style>
+
+/* ===== ESTILO GERAL ===== */
+
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#121212;
+    color:white;
+    padding:20px;
+}
+
+h1{
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.container{
+    display:flex;
+    gap:25px;
+    flex-wrap:wrap;
+}
+
+.box{
+    flex:1;
+    min-width:320px;
+    background:#1e1e1e;
+    padding:20px;
+    border-radius:20px;
+    box-shadow:0 0 20px rgba(255,140,0,0.15);
+    transition:0.3s;
+}
+
+.box:hover{
+    transform:scale(1.01);
+}
+
+/* ===== INPUTS ===== */
+
+input, textarea{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:12px;
+    background:#2a2a2a;
+    color:white;
+    margin-top:8px;
+    margin-bottom:12px;
+}
+
+textarea{
+    resize:none;
+    height:70px;
+}
+
+/* ===== BOTÕES ===== */
+
+button{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:15px;
+    background:linear-gradient(45deg, orange, #ff5e00);
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.3s;
+    margin-top:10px;
+}
+
+button:hover{
+    transform:scale(1.03);
+}
+
+/* ===== RESULTADO ===== */
+
+.result{
+    background:#0f3d0f;
+    padding:15px;
+    border-radius:15px;
+    margin-top:15px;
+}
+
+/* ===== TABELA ===== */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:15px;
+}
+
+td, th{
+    border-bottom:1px solid #333;
+    padding:10px;
+    text-align:center;
+}
+
+/* ===== SLIDER ===== */
+
+.slider{
+    width:100%;
+}
+
+.margemValor{
+    text-align:center;
+    color:orange;
+    font-size:18px;
+    margin-bottom:10px;
+}
+
+/* ===== BOTÕES PEQUENOS ===== */
+
+.btnPequeno{
+    width:auto;
+    padding:6px 12px;
+    margin:2px;
+    border-radius:10px;
+    font-size:12px;
+}
+
+.btnExcluir{
+    background:#ff2a2a;
+}
+
+.btnEditar{
+    background:#0099ff;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>📒 Controle de Pedidos e Lucro</h1>
+
+<div class="container">
+
+<!-- ================= CALCULADORA ================= -->
+
+<div class="box">
+
+<h2>Calculadora</h2>
+
+<input id="comida" placeholder="Nome da comida">
+
+<input id="precoKg" type="number" placeholder="Preço do KG">
+
+<input id="gramas" type="number" placeholder="Quantidade em gramas">
+
+<input id="embalagem" type="number" placeholder="Embalagem">
+
+<input id="impostos" type="number" placeholder="Impostos">
+
+<label>Margem de lucro</label>
+
+<input type="range" min="0" max="200" value="30"
+class="slider"
+id="margem"
+oninput="mostrarMargem()">
+
+<div class="margemValor" id="valorMargem">30%</div>
+
+<button onclick="calcular()">Calcular</button>
+
+<div class="result" id="resultado">
+Resultado aparecerá aqui
+</div>
+
+</div>
+
+<!-- ================= PEDIDOS ================= -->
+
+<div class="box">
+
+<h2>Novo Pedido</h2>
+
+<input id="cliente" placeholder="Nome do cliente">
+
+<input id="pedidoComida" placeholder="Comida">
+
+<input id="precoFinal" type="number" placeholder="Preço final">
+
+<textarea id="obs" placeholder="Observações"></textarea>
+
+<button onclick="salvarPedido()">Salvar Pedido</button>
+
+<table>
+<thead>
+<tr>
+<th>Cliente</th>
+<th>Comida</th>
+<th>Preço</th>
+<th>Ações</th>
+</tr>
+</thead>
+
+<tbody id="listaPedidos"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<script>
+
+/* ===== VARIÁVEIS ===== */
+
+let pedidos = []
+let editando = -1
+
+/* ===== MOSTRAR VALOR DO SLIDER ===== */
+
+function mostrarMargem(){
+    let m = document.getElementById("margem").value
+    document.getElementById("valorMargem").innerText = m + "%"
+}
+
+/* ===== CALCULADORA ===== */
+
+function calcular(){
+
+    let precoKg = Number(document.getElementById("precoKg").value)
+    let gramas = Number(document.getElementById("gramas").value)
+    let embalagem = Number(document.getElementById("embalagem").value)
+    let impostos = Number(document.getElementById("impostos").value)
+    let margem = Number(document.getElementById("margem").value)
+
+    let custoComida = (precoKg / 1000) * gramas
+    let custoTotal = custoComida + embalagem + impostos
+    let precoVenda = custoTotal + (custoTotal * margem / 100)
+
+    document.getElementById("resultado").innerHTML =
+    "Custo total: R$ " + custoTotal.toFixed(2) +
+    "<br>Preço sugerido: R$ " + precoVenda.toFixed(2) +
+    "<br>Lucro estimado: R$ " + (precoVenda - custoTotal).toFixed(2)
+
+}
+
+/* ===== SALVAR PEDIDO ===== */
+
+function salvarPedido(){
+
+    let cliente = document.getElementById("cliente").value
+    let comida = document.getElementById("pedidoComida").value
+    let preco = document.getElementById("precoFinal").value
+    let obs = document.getElementById("obs").value
+
+    if(cliente === "" || comida === "" || preco === ""){
+        alert("Preencha tudo")
+        return
+    }
+
+    let pedido = {
+        cliente,
+        comida,
+        preco,
+        obs
+    }
+
+    if(editando >= 0){
+        pedidos[editando] = pedido
+        editando = -1
+    }else{
+        pedidos.push(pedido)
+    }
+
+    limparCampos()
+    atualizarTabela()
+}
+
+/* ===== LIMPAR CAMPOS ===== */
+
+function limparCampos(){
+    document.getElementById("cliente").value = ""
+    document.getElementById("pedidoComida").value = ""
+    document.getElementById("precoFinal").value = ""
+    document.getElementById("obs").value = ""
+}
+
+/* ===== ATUALIZAR TABELA ===== */
+
+function atualizarTabela(){
+
+    let tabela = document.getElementById("listaPedidos")
+    tabela.innerHTML = ""
+
+    pedidos.forEach((p, i)=>{
+
+        tabela.innerHTML += `
+        <tr>
+        <td>${p.cliente}</td>
+        <td>${p.comida}</td>
+        <td>R$ ${Number(p.preco).toFixed(2)}</td>
+        <td>
+        <button class="btnPequeno btnEditar" onclick="editarPedido(${i})">Editar</button>
+        <button class="btnPequeno btnExcluir" onclick="excluirPedido(${i})">Excluir</button>
+        </td>
+        </tr>
+        `
+    })
+}
+
+/* ===== EDITAR ===== */
+
+function editarPedido(i){
+
+    let p = pedidos[i]
+
+    document.getElementById("cliente").value = p.cliente
+    document.getElementById("pedidoComida").value = p.comida
+    document.getElementById("precoFinal").value = p.preco
+    document.getElementById("obs").value = p.obs
+
+    editando = i
+}
+
+/* ===== EXCLUIR ===== */
+
+function excluirPedido(i){
+
+    if(confirm("Excluir pedido?")){
+        pedidos.splice(i,1)
+        atualizarTabela()
+    }
+
+}
+
+/* ===== INICIAL ===== */
+
+mostrarMargem()
+
+</script>

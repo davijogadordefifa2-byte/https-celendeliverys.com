@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Delivery Manager</title>
+
+<style>
+body{
+font-family: Arial;
+background:#f6f6f6;
+margin:0;
+}
+
+header{
+background:white;
+padding:20px;
+font-size:22px;
+font-weight:bold;
+box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
+
+.container{
+display:grid;
+grid-template-columns: 320px 1fr 260px;
+gap:20px;
+padding:20px;
+}
+
+.box{
+background:white;
+padding:20px;
+border-radius:12px;
+box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
+
+input{
+width:100%;
+padding:10px;
+margin-top:8px;
+margin-bottom:10px;
+border-radius:8px;
+border:1px solid #ccc;
+}
+
+button{
+width:100%;
+padding:12px;
+border:none;
+border-radius:8px;
+background:#ff7a00;
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
+button:hover{
+background:#e06700;
+}
+
+.result{
+margin-top:15px;
+padding:15px;
+border-radius:10px;
+background:#e6ffe6;
+font-weight:bold;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th,td{
+padding:10px;
+border-bottom:1px solid #ddd;
+text-align:center;
+}
+
+.smallBtn{
+padding:6px;
+font-size:12px;
+width:auto;
+margin:2px;
+}
+</style>
+</head>
+
+<body>
+
+<header>🍔 Delivery Manager</header>
+
+<div class="container">
+
+<!-- CALCULADORA -->
+<div class="box">
+
+<h3>Calculadora de Preços</h3>
+
+<input id="comida" placeholder="Nome da comida">
+
+<input id="custo" type="number" placeholder="Custo ingredientes">
+
+<input id="embalagem" type="number" placeholder="Custo embalagem">
+
+<input id="precoVenda" type="number" placeholder="Preço venda">
+
+<button onclick="calcular()">Calcular</button>
+
+<div class="result" id="resultado">Resultado aparecerá aqui</div>
+
+</div>
+
+<!-- PEDIDOS -->
+<div class="box">
+
+<h3>Pedidos</h3>
+
+<input id="cliente" placeholder="Nome cliente">
+
+<input id="pedidoComida" placeholder="Comida">
+
+<input id="pedidoPreco" type="number" placeholder="Preço">
+
+<button onclick="salvarPedido()">Salvar Pedido</button>
+
+<table>
+<thead>
+<tr>
+<th>Cliente</th>
+<th>Comida</th>
+<th>Preço</th>
+<th>Ações</th>
+</tr>
+</thead>
+
+<tbody id="listaPedidos"></tbody>
+
+</table>
+
+</div>
+
+<!-- RELATÓRIO -->
+<div class="box">
+
+<h3>Relatórios</h3>
+
+<p>Total vendas: <b id="totalVendas">R$0</b></p>
+<p>Total pedidos: <b id="totalPedidos">0</b></p>
+<p>Lucro total: <b id="lucroTotal">R$0</b></p>
+
+</div>
+
+</div>
+
+<script>
+
+let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+
+function calcular(){
+
+let custo = Number(document.getElementById("custo").value);
+let embalagem = Number(document.getElementById("embalagem").value);
+let venda = Number(document.getElementById("precoVenda").value);
+
+let total = custo + embalagem;
+let lucro = venda - total;
+
+let texto = lucro >= 0 
+? "Você está lucrando R$ " + lucro.toFixed(2)
+: "Você está no prejuízo R$ " + lucro.toFixed(2);
+
+document.getElementById("resultado").innerText = texto;
+
+}
+
+function salvarPedido(){
+
+let cliente = document.getElementById("cliente").value;
+let comida = document.getElementById("pedidoComida").value;
+let preco = Number(document.getElementById("pedidoPreco").value);
+
+if(!cliente || !comida || !preco) return;
+
+pedidos.push({cliente, comida, preco});
+
+localStorage.setItem("pedidos", JSON.stringify(pedidos));
+
+mostrarPedidos();
+
+}
+
+function mostrarPedidos(){
+
+let tabela = document.getElementById("listaPedidos");
+tabela.innerHTML = "";
+
+let total = 0;
+
+pedidos.forEach((p,i)=>{
+
+total += p.preco;
+
+tabela.innerHTML += `
+<tr>
+<td>${p.cliente}</td>
+<td>${p.comida}</td>
+<td>R$ ${p.preco}</td>
+<td>
+<button class="smallBtn" onclick="editar(${i})">Editar</button>
+<button class="smallBtn" onclick="excluir(${i})">Excluir</button>
+</td>
+</tr>
+`;
+
+});
+
+document.getElementById("totalVendas").innerText = "R$ " + total.toFixed(2);
+document.getElementById("totalPedidos").innerText = pedidos.length;
+
+let custoBase = total * 0.7;
+let lucro = total - custoBase;
+
+document.getElementById("lucroTotal").innerText = "R$ " + lucro.toFixed(2);
+
+}
+
+function excluir(i){
+
+pedidos.splice(i,1);
+localStorage.setItem("pedidos", JSON.stringify(pedidos));
+mostrarPedidos();
+
+}
+
+function editar(i){
+
+let novoPreco = prompt("Novo preço:", pedidos[i].preco);
+if(novoPreco){
+pedidos[i].preco = Number(novoPreco);
+localStorage.setItem("pedidos", JSON.stringify(pedidos));
+mostrarPedidos();
+}
+
+}
+
+mostrarPedidos();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Pedidos da Mãe</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>Pedidos da Mãe</header>
+
+<div class="container">
+
+  <!-- Calculadora -->
+  <div class="box">
+    <h3>Calculadora</h3>
+    <input id="nomeComida" placeholder="Nome da comida">
+    <input id="precoKg" type="number" placeholder="Preço por KG">
+    <input id="peso" type="number" placeholder="Peso em gramas">
+    <input id="embalagem" type="number" placeholder="Custo embalagem">
+    <input id="ingredientes" type="number" placeholder="Custo ingredientes">
+    <input id="desconto" type="number" placeholder="Desconto" value="0">
+    <label>Margem de Lucro (%)</label>
+    <input id="margem" type="range" min="0" max="100" value="30">
+    <div class="resultado" id="precoFinal">Preço Final: R$0</div>
+    <div id="lucroTexto"></div>
+    <button onclick="adicionarCarrinho()">Adicionar ao Carrinho</button>
+  </div>
+
+  <!-- Carrinho -->
+  <div class="box">
+    <h3>Carrinho</h3>
+    <input id="cliente" placeholder="Nome do cliente">
+    <table>
+      <thead>
+        <tr><th>Comida</th><th>Preço</th><th>Remover</th></tr>
+      </thead>
+      <tbody id="carrinhoTabela"></tbody>
+    </table>
+    <div class="resultado" id="totalCarrinho">Total: R$0</div>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
